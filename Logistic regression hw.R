@@ -1,11 +1,11 @@
 ## Regression with binary outcomes
-## âââââââââââââââââââââââââââââââââ
+## ═════════════════════════════════
 
 ## Logistic regression
-## âââââââââââââââââââââââ
+## ───────────────────────
 
 ##   This far we have used the `lm' function to fit our regression models.
-##   `lm' is great, but limitedâin particular it only fits models for
+##   `lm' is great, but limited–in particular it only fits models for
 ##   continuous dependent variables. For categorical dependent variables we
 ##   can use the `glm()' function.
 
@@ -24,13 +24,13 @@
 
 ##   Load the National Health Interview Survey data:
 
-NH11 <- readRDS("dataSets/NatHealth2011.rds")
+NH11 <- readRDS("NatHealth2011.rds")
 labs <- attributes(NH11)$labels
 
 ##   [CDC website] http://www.cdc.gov/nchs/nhis.htm
 
 ## Logistic regression example
-## âââââââââââââââââââââââââââââââ
+## ───────────────────────────────
 
 ##   Let's predict the probability of being diagnosed with hypertension
 ##   based on age, sex, sleep, and bmi
@@ -45,7 +45,7 @@ hyp.out <- glm(hypev~age_p+sex+sleep+bmi,
 coef(summary(hyp.out))
 
 ## Logistic regression coefficients
-## ââââââââââââââââââââââââââââââââââââ
+## ────────────────────────────────────
 
 ##   Generalized linear models use link functions, so raw coefficients are
 ##   difficult to interpret. For example, the age coefficient of .06 in the
@@ -61,7 +61,7 @@ hyp.out.tab[, "Estimate"] <- exp(coef(hyp.out))
 hyp.out.tab
 
 ## Generating predicted values
-## âââââââââââââââââââââââââââââââ
+## ───────────────────────────────
 
 ##   In addition to transforming the log-odds produced by `glm' to odds, we
 ##   can use the `predict()' function to make direct statements about the
@@ -85,7 +85,7 @@ cbind(predDat, predict(hyp.out, type = "response",
 ##   has a 48% probability of having been diagnosed.
 
 ## Packages for  computing and graphing predicted values
-## âââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+## ─────────────────────────────────────────────────────────
 
 ##   Instead of doing all this ourselves, we can use the effects package to
 ##   compute quantities of interest for us (cf. the Zelig package).
@@ -94,19 +94,27 @@ library(effects)
 plot(allEffects(hyp.out))
 
 ## Exercise: logistic regression
-## âââââââââââââââââââââââââââââââââââ
+## ───────────────────────────────────
 
 ##   Use the NH11 data set that we loaded earlier.
 
 ##   1. Use glm to conduct a logistic regression to predict ever worked
 ##      (everwrk) using age (age_p) and marital status (r_maritl).
+labels(NH11$r_maritl)
 
-##create two groups, one is yes , rest of the data is no. 
 library(dplyr) 
 NH11 %>% group_by(r_maritl) %>% summarise(tot=n())
 NH11$r_maritl <- droplevels(NH11$r_maritl)
 
+
+NH11 %>% group_by(everwrk)%>%summarise(tot=n())
+
+
+NH11$everwrk[NH11$everwrk %in% c(NA)]<-'2 No'
+##create two groups, one is yes , rest of the data is no. 
+
 ##clean up everwrk
+
 
 
 everwrk.out = glm(everwrk~age_p+r_maritl,
@@ -114,6 +122,32 @@ everwrk.out = glm(everwrk~age_p+r_maritl,
 ##   2. Predict the probability of working for each level of marital
 ##      status.
 
+predict_everwrk<- predict(everwrk.out, type="response")
+
+table(NH11$everwrk,predict_everwrk>0.5 )
+
+## The original model is very bad model because I put too many different result to effect the model. 
+##FALSE  TRUE
+##1 Yes              5983  6170
+##2 No               2275 18586
+##7 Refused             0     0
+##8 Not ascertained     0     0
+##9 Don't know          0     0
+
+# exclude NA
+library(caTools)
+
+
+NH11_clean<-NH11%>% filter(!is.na(everwrk))
+
+everwrk.out_clean = glm(everwrk~age_p+r_maritl,
+                        data=NH11_clean, family="binomial")
+
+table(NH11$everwrk,predict_everwrk>0.7 )
+table(NH11$everwrk,predict_everwrk>0.3 )
+table(NH11$everwrk,predict_everwrk>0.5 )
+
+#the model is better when I use possibility over 0.3
 
 ##   Note that the data is not perfectly clean and ready to be modeled. You
 ##   will need to clean up at least some of the variables before fitting
