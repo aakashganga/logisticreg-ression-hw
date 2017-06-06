@@ -144,8 +144,28 @@ everwrk.out_clean = glm(everwrk~age_p+r_maritl,
                         data=NH11_clean, family="binomial")
 
 table(NH11$everwrk,predict_everwrk>0.7 )
+#                  
+#                   FALSE  TRUE
+#1 Yes              8881  3272
+#2 No               8895 11941
+#7 Refused            11     6
+#8 Not ascertained     0     0
+#9 Don't know          8     0
 table(NH11$everwrk,predict_everwrk>0.3 )
+#                  FALSE  TRUE
+#1 Yes              2309  9844
+#2 No                462 20374
+#7 Refused             3    14
+#8 Not ascertained     0     0
+#9 Don't know          5     3
 table(NH11$everwrk,predict_everwrk>0.5 )
+
+#                  FALSE  TRUE
+#1 Yes              5983  6170
+#2 No               2263 18573
+#7 Refused             6    11
+#8 Not ascertained     0     0
+#9 Don't know          6     2
 
 #the model is better when I use possibility over 0.3
 
