@@ -24,7 +24,7 @@ library(ROCR)
 PredictROC = predict(StevensTree, newdata = Test)
 #PredictROC has 2 columns, the probability of true and false. the second column is yes
 ROCRpred = prediction(PredictROC[,2],Test$Reverse)
-perf= performance(ROCRpred, "tpr" ,"fpr")
+perf= performance(ROCRpred, "tpr" ,"fpr", colorize="")
 plot(perf)
 
 
